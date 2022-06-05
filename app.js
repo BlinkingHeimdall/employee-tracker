@@ -35,6 +35,14 @@ function init() {
         };
     
         function viewRoles() {
+            const sql = `SELAECT * From roles`;
+            db.query(sql, (err, rows) => {
+                if (err) {
+                    console.log(err.message);
+                    return;
+                }
+                console.table(rows);
+            });
     
         };
     
