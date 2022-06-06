@@ -70,9 +70,11 @@ function init() {
         };
 
         function viewRoles() {
-            const sql = ``;
+            const sql = `SELECT roles.id, roles.title, departments.department, roles.salary
+                        FROM roles
+                        INNER JOIN departments ON roles.department_id = departments.id`;
             db.query(sql, (err, rows) => {
-                if (err) {
+                if(err) {
                     console.log(err.message);
                     return;
                 }
@@ -82,12 +84,12 @@ function init() {
         };
     
         function viewEmployees() {
-                const sql = `SELECT employees.first_name, employees.last_name, roles.title, roles.department_id, roles.salary, departments.title, employees.manager_id
-                FROM employees
-                INNER JOIN roles ON employees.role_id = roles.id
-                INNER JOIN departments ON roles.department_id = departments.id
-                
-                `;
+            const sql = `SELECT employees.id, employees.first_name, employees.last_name,
+                        roles.title, departments.department, roles.salary,
+                        employees.manager_id AS manager
+                        FROM employees
+                        INNER JOIN roles ON employees.role_id = roles.id
+                        INNER JOIN departments ON roles.department_id = departments.id`;
                 db.query(sql, (err, rows) => {
                     if (err) {
                         console.log(err.message)
@@ -106,7 +108,7 @@ function init() {
                     message: 'What is the new department called'
                 }
             ]).then(input => {
-                const sql = `INSERT INTO departments (title) VALUES (?)`;
+                const sql = `INSERT INTO departments (department) VALUES (?)`;
                 const params = input.new_department;
                 db.query(sql, params, (err, result) => {
                     if (err) {
@@ -117,7 +119,7 @@ function init() {
                     restart();
                 });
             });
-        };;
+        };
     
         function addRole() {
 
@@ -126,6 +128,23 @@ function init() {
                     type: 'input',
                     name: 'title',
                     message: 'What is the new role called?'
+                },
+                {
+                    type: 'input',
+                    name: 'department_id',
+                    message: `What is the new role's department id?`,
+                    validate: input => {
+                        if(isNaN(input)) {
+                            console.log('Please enter a number');
+                            return false;
+                        } else {
+                            if(!isNaN(input)) {
+                            return true;
+                        } else {
+                            console.log(' Please enter a number');
+                            return false;
+                        };
+                    }
                 },
                 {
                     type: 'input',
@@ -139,23 +158,10 @@ function init() {
                             return true;
                         };
                     }
-                },
-                {
-                    type: 'input',
-                    name: 'department_id',
-                    message: `What is the new role's department id?`,
-                    validate: input => {
-                        if(!isNaN(input)) {
-                            return true;
-                        } else {
-                            console.log(' Please enter a number');
-                            return false;
-                        };
-                    }
                 }
             ]).then(input => {
-                const sql = `INSERT INTO roles(title, salary, department_id) VALUES (?,?,?)`;
-                const params = [input.title, input.salary, input.department_id];
+                const sql = `INSERT INTO roles(title, department_id, salary) VALUES (?,?,?)`;
+                const params = [input.title, input.department_id, input.salary];
                 db.query(sql, params, (err, result) => {
                     if(err) {
                         console.log(err);
