@@ -123,7 +123,6 @@ function init() {
         };
     
         function addRole() {
-
             inquirer.prompt([
                 {
                     type: 'input',
@@ -135,11 +134,7 @@ function init() {
                     name: 'department_id',
                     message: `What is the new role's department id?`,
                     validate: input => {
-                        if(isNaN(input)) {
-                            console.log('Please enter a number');
-                            return false;
-                        } else {
-                            if(!isNaN(input)) {
+                        if(!isNaN(input)) {
                             return true;
                         } else {
                             console.log(' Please enter a number');
@@ -173,6 +168,7 @@ function init() {
                 });
             });
         };
+    
     
         function addEmployee() {
 
@@ -228,17 +224,18 @@ function init() {
         };
     
         function updateRole() {
-
             const employees = [];
             db.query(`SELECT employees.id, employees.first_name, employees.last_name FROM employees`, (err, result) => {
                 if(err) {
                     console.log(err);
                     return;
                 }
+    
                 result.forEach(item => {
                     const name = `${item.first_name} ${item.last_name}`;
                     employees.push(name);
                 });
+    
                 inquirer.prompt([
                     {
                         type: 'list',
@@ -260,19 +257,20 @@ function init() {
                         }
                     }
                 ]).then(input => {
-                    const filter = result.filter(id => id.id === input)
+                    const split = input.update.split(' ');
                     const sql = `UPDATE employees
-                                 SET role_id = ${input.new_role}
-                                 WHERE id = ${result.id}`
+                                SET role_id = ${input.new_role}
+                                WHERE first_name = '${split[0]}'
+                                AND last_name = '${split[1]}'`
                     db.query(sql, (err, result) => {
                         if(err) {
                             console.log(err);
                         }
-                        console.log(result);
+                        console.log(`Updated ${input.update}'s role`);
+                        restart();
                     });
                 });
             });
-            })
         };
     
         options();
