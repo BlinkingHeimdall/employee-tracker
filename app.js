@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+const table = require('console.table');
 const db = require('./db/connection');
 
 
@@ -50,13 +51,14 @@ function init() {
             .then(confirm => {
                 if(confirm.confirm_restart) {
                     options();
+                } else {
+                    db.end();
                 }
             });
         };
 
         function viewDepartments() {
             const sql = `SELECT * FROM departments`;
-
             db.query(sql, (err, rows) => {
                 if(err) {
                     console.log(err.message);
@@ -80,7 +82,8 @@ function init() {
         };
     
         function viewEmployees() {
-                const sql = `SELECT * FROM employees`;
+                const sql = `SELECT roles *, employees.role_id AS title
+                From`
                 db.query(sql, (err, rows) => {
                     if (err) {
                         console.log(err.message)
@@ -106,7 +109,7 @@ function init() {
                         console.log(err);
                         return;
                     }
-                    viewDepartments();
+                    console.log(`Added ${params} to the database`);
                 });
             });
         };;
@@ -153,7 +156,7 @@ function init() {
                         console.log(err);
                         return;
                     }
-                    viewRoles();
+                    console.log(`Added ${params[0]} to the database`);
                 });
             });
         };
@@ -163,24 +166,67 @@ function init() {
             inquirer.prompt([
                 {
                     type: 'input',
-                    name: 'new_department',
-                    message: 'What is the new department called?'
+                    name: 'first_name',
+                    message: `What is the new employee's first name?`
+                },
+                {
+                    type: 'input',
+                    name: 'last_name',
+                    message: `What is the new employee's last name?`
+                },
+                {
+                    type: 'input',
+                    name: 'role_id',
+                    message: `What is the new employee's role id?`,
+                    validate: input => {
+                        if(!isNaN(input)) {
+                            return true;
+                        } else {
+                            console.log(' Please enter a number');
+                            return false;
+                        };
+                    }
+                },
+                {
+                    type: 'input',
+                    name: 'manager_id',
+                    message: `What is the new employee's manager id?`,
+                    validate: input => {
+                        if(!isNaN(input)) {
+                            return true;
+                        } else {
+                            console.log(' Please enter a number');
+                            return false;
+                        };
+                    }
                 }
             ]).then(input => {
-                const sql = `INSERT INTO departments (title) VALUES (?)`;
-                const params = input.new_department;
+                const sql = `INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
+                const params = [input.first_name, input.last_name, input.role_id, input.manager_id];
                 db.query(sql, params, (err, result) => {
                     if(err) {
                         console.log(err);
                         return;
                     }
-                    viewDepartments();
+                    console.log(`Added ${params[0]} ${params[1]} to the database`);
                 });
             });
         };
     
         function updateRole() {
-    
+
+            const employees = [];
+            db.query(`SELECT * FROM employees`, (err, result) => {
+                if(err) {
+                    console.log(err);
+                    return;
+                }
+                result.forEach(item => {
+                    const name = `${item.first_name} ${item.last_name}`;
+                    employees.push(name);
+                })
+                console.log(employees)
+            })
         };
     
         options();
