@@ -6,8 +6,12 @@ VALUES
 
 INSERT INTO roles(title, salary, department_id)
 VALUES
-('IT Professional', 36000, 1);
+('IT Professional', 37000, 1);
+('IT Specialist', 28000, 1),
+('IT Professional', 37000, 1),
+('Back-End Developer', 90000, 1);
 
 INSERT INTO employees(first_name, last_name, role_id, manager_id)
 VALUES
-('Ben', 'Milner', 1, 1);
+('Jason', 'Adams', 1, 1),
+('Eric', 'Walker', 3, 1);
