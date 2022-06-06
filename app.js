@@ -8,6 +8,7 @@ function init() {
             {
                 type: 'list',
                 name: 'action',
+                message: 'What would you like to do?',
                 choices: ['all roles', 'all employees', 'add department', 'add role', 'add employee', 'update employee role']
             },
         ]). then (input => {
@@ -34,6 +35,22 @@ function init() {
             });
         };
     
+        function restart() {
+            inquirer.prompt([
+                {
+                    type: 'confirm',
+                    name: 'confirm_restart',
+                    message: 'Would you like to do something else?',
+                    default: false
+                }
+            ])
+            .then(confirm => {
+                if(confirm.confirm_restart) {
+                    options();
+                }
+            });
+        };
+        
         function viewRoles() {
             const sql = `SELAECT * From roles`;
             db.query(sql, (err, rows) => {
