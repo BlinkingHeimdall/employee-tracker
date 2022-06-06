@@ -84,15 +84,16 @@ function init() {
         };
     
         function viewEmployees() {
-            const sql = `SELECT employees.id, employees.first_name, employees.last_name,
+            const sql = `SELECT e.id, e.first_name, e.last_name,
                         roles.title, departments.department, roles.salary,
-                        employees.manager_id AS manager
-                        FROM employees
-                        INNER JOIN roles ON employees.role_id = roles.id
-                        INNER JOIN departments ON roles.department_id = departments.id`;
-                db.query(sql, (err, rows) => {
-                    if (err) {
-                        console.log(err.message)
+                        concat(m.first_name, ' ', m.last_name) manager
+                        FROM employees e
+                        INNER JOIN roles ON e.role_id = roles.id
+                        INNER JOIN departments ON roles.department_id = departments.id
+                        INNER JOIN employees m ON m.id = e.manager_id`;
+            db.query(sql, (err, rows) => {
+                if(err) {
+                    console.log(err.message);
                         return;
                     }
                     console.table(rows);
@@ -229,7 +230,7 @@ function init() {
         function updateRole() {
 
             const employees = [];
-            db.query(`SELECT * FROM employees`, (err, result) => {
+            db.query(`SELECT employees.id, employees.first_name, employees.last_name FROM employees`, (err, result) => {
                 if(err) {
                     console.log(err);
                     return;
@@ -237,8 +238,40 @@ function init() {
                 result.forEach(item => {
                     const name = `${item.first_name} ${item.last_name}`;
                     employees.push(name);
-                })
-                console.log(employees)
+                });
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'update',
+                        message: `Who's role do you want to update?`,
+                        choices: employees
+                    },
+                    {
+                        type: 'input',
+                        name: 'new_role',
+                        message: `What is their new role id?`,
+                        validate: input => {
+                            if(!isNaN(input)) {
+                                return true;
+                            } else {
+                                console.log(' Please enter a number');
+                                return false;
+                            };
+                        }
+                    }
+                ]).then(input => {
+                    const filter = result.filter(id => id.id === input)
+                    const sql = `UPDATE employees
+                                 SET role_id = ${input.new_role}
+                                 WHERE id = ${result.id}`
+                    db.query(sql, (err, result) => {
+                        if(err) {
+                            console.log(err);
+                        }
+                        console.log(result);
+                    });
+                });
+            });
             })
         };
     
