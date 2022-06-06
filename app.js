@@ -70,7 +70,7 @@ function init() {
         };
 
         function viewRoles() {
-            const sql = `SELAECT * From roles`;
+            const sql = ``;
             db.query(sql, (err, rows) => {
                 if (err) {
                     console.log(err.message);
@@ -82,8 +82,12 @@ function init() {
         };
     
         function viewEmployees() {
-                const sql = `SELECT roles *, employees.role_id AS title
-                From`
+                const sql = `SELECT employees.first_name, employees.last_name, roles.title, roles.department_id, roles.salary, departments.title, employees.manager_id
+                FROM employees
+                INNER JOIN roles ON employees.role_id = roles.id
+                INNER JOIN departments ON roles.department_id = departments.id
+                
+                `;
                 db.query(sql, (err, rows) => {
                     if (err) {
                         console.log(err.message)
@@ -110,6 +114,7 @@ function init() {
                         return;
                     }
                     console.log(`Added ${params} to the database`);
+                    restart();
                 });
             });
         };;
@@ -157,6 +162,7 @@ function init() {
                         return;
                     }
                     console.log(`Added ${params[0]} to the database`);
+                    restart();
                 });
             });
         };
@@ -209,6 +215,7 @@ function init() {
                         return;
                     }
                     console.log(`Added ${params[0]} ${params[1]} to the database`);
+                    restart();
                 });
             });
         };
