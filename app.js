@@ -12,7 +12,7 @@ function init() {
                 message: 'What would you like to do?',
                 choices: ['all departments','all roles', 'all employees', 'add department', 'add role', 'add employee', 'update employee role']
             },
-        ]). then (input => {
+        ]).then(input => {
             switch(input.action) {
                 case 'all departments':
                     viewDepartments();
@@ -56,7 +56,7 @@ function init() {
                 }
             });
         };
-
+    
         function viewDepartments() {
             const sql = `SELECT * FROM departments`;
             db.query(sql, (err, rows) => {
@@ -68,7 +68,7 @@ function init() {
                 restart();
             });
         };
-
+    
         function viewRoles() {
             const sql = `SELECT roles.id, roles.title, departments.department, roles.salary
                         FROM roles
@@ -79,8 +79,8 @@ function init() {
                     return;
                 }
                 console.table(rows);
+                restart();
             });
-    
         };
     
         function viewEmployees() {
@@ -90,29 +90,29 @@ function init() {
                         FROM employees e
                         INNER JOIN roles ON e.role_id = roles.id
                         INNER JOIN departments ON roles.department_id = departments.id
-                        INNER JOIN employees m ON m.id = e.manager_id`;
+                        LEFT JOIN employees m ON m.id = e.manager_id`;
             db.query(sql, (err, rows) => {
                 if(err) {
                     console.log(err.message);
-                        return;
-                    }
-                    console.table(rows);
-                    restart();
-                });
+                    return;
+                }
+                console.table(rows);
+                restart();
+            });
         };
     
         function addDepartment() {
             inquirer.prompt([
                 {
                     type: 'input',
-                    name: 'new-department',
-                    message: 'What is the new department called'
+                    name: 'new_department',
+                    message: 'What is the new department called?'
                 }
             ]).then(input => {
-                const sql = `INSERT INTO departments (department) VALUES (?)`;
+                const sql = `INSERT INTO departments(department) VALUES (?)`;
                 const params = input.new_department;
                 db.query(sql, params, (err, result) => {
-                    if (err) {
+                    if(err) {
                         console.log(err);
                         return;
                     }
@@ -169,9 +169,7 @@ function init() {
             });
         };
     
-    
         function addEmployee() {
-
             inquirer.prompt([
                 {
                     type: 'input',
@@ -272,7 +270,7 @@ function init() {
                 });
             });
         };
-    
+        
         options();
     };
     
