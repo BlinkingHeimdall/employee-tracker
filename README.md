@@ -48,7 +48,9 @@ node app
 ~~~
 
 ## Usage
-You need to kow how to run nodejs and sql
+You need to kow how to run nodejs and sql.
+
+A video toview demonstration is here. [Demonstration](https://drive.google.com/file/d/1-OYdhPQH4bo8SL_E_iA2RAuevRXL7zZq/view)
 
 ## Contributing
 n/a
